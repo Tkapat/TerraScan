@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mars Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+    <div class="main-container">
+        <header class="app-header">
+            <h2>🚀 Mars Mission Explorer</h2>
+            <p class="tagline">Discover fascinating photos from the Red Planet!</p>
+        </header>
+
+        <section class="mission-selection-card">
+            <h3>Explore Mars Data</h3>
+            <p>{{ message }}</p>
+            <p>This section is under construction! Check back soon for more Mars discoveries.</p>
+        </section>
+
+        <footer class="app-footer">
+            <p>Go back to the <a href="{{url_for('index')}}">main page</a>.</p>
+        </footer>
+    </div>
+</body>
+</html>
