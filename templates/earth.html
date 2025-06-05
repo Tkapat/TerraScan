@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NASA Earth Image Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+    <div class="main-container"> <header class="app-header">
+            <h2>🌍 Earth Imagery Explorer</h2>
+            <p class="tagline">Visualize Earth's surface for specific locations and dates.</p>
+        </header>
+
+        <section class="mission-selection-card"> <h3>Get Satellite Image</h3>
+            {% if error %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form action="/earth" method="POST">
+                <div class="form-group">
+                    <label for="api"></label>
+                    <input type="text" id="api" name="api" placeholder="Enter your API Key"
+                            required>
+                </div>
+                <div class="form-group">
+                    <label for="latitude"></label>
+                    <input type="text" id="latitude" name="latitude" placeholder="Latitude: e.g. 22.5"
+                            required>
+                </div>
+                <div class="form-group">
+                    <label for="longitude"></label>
+                    <input type="text" id="longitude" name="longitude" placeholder=" Longitude: e.g. 88.3"
+                            required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date"
+                           value=" date " required>
+                </div>
+                <div class="form-group">
+                <label for="mission-dropdown">Area</label>
+                <select id="area" name="area" class="modern-dropdown">
+                    <option value="">-- Select an Area --</option>
+                       <option value="1" {% if area_val == "1" %}selected{% endif %}>Highly Zoomed in(1x1 Km)</option>
+                        <option value="25" {% if area_val == "25" %}selected{% endif %}>Neighbourhood/City(5x5 Km)</option>
+                        <option value="100" {% if area_val == "100" %}selected{% endif %}>Regional View(10x10 Km)</option>
+                        <option value="400" {% if area_val == "400" %}selected{% endif %}>Large Area/State(20x20 Km)</option>
+                        <option value="2500" {% if area_val == "2500" %}selected{% endif %}>Continental(50x50 Km)</option>
+                        <option value="10000" {% if area_val == "10000" %}selected{% endif %}>Global View(100x100 Km)</option>
+                    </select>
+            </div>
+                <button type="submit" class="action-button">Get Image</button>
+            </form>
+        </section>
+
+        {% if image_url %}
+            <section class="image-display-card"> <h3>Here is your image:</h3>
+                <img src="{{ image_url }}" alt="Earth Image">
+                <p>The image was downloaded and served from your server.</p>
+                <a href="{{ image_url }}" download="nasa_earth_image.jpeg" class="download-button">
+                    Download Image
+                </a>
+            </section>
+        {% endif %}
+
+        <footer class="app-footer">
+            <p>Go back to the <a href="{{url_for( 'index')}}">main page</a>.</p>
+        </footer>
+    </div>
+</body>
+</html>
