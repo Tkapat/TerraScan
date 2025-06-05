@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Planetary Mission Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+
+    <div class="main-container">
+        <header class="app-header">
+            <h1>🌌 Planetary Mission Explorer</h1>
+            <p class="tagline">Explore real data and stunning images from NASA space missions.</p>
+        </header>
+        <div><p>Don't have an API Key?
+        <a href="https://api.nasa.gov/#signUp" target="_blank"><button class="action-button"> Generate API Key </button></a></p></div>
+
+        <section class="mission-selection-card">
+            <h2>Select a Mission</h2>
+            <div class="form-group">
+                <label for="mission-dropdown">Choose your destination:</label>
+                <select id="mission-dropdown" class="modern-dropdown">
+                    <option value="earth">Earth Imagery</option>
+                    <option value="mars">Mars Rover Photos</option>
+                    <option value="asteroids">Near-Earth Asteroids</option>
+                    </select>
+            </div>
+            <button onclick="goToMission()" class="action-button">Explore Mission</button>
+        </section>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 CurioCode. Powered by NASA APIs and Flask.</p>
+            <p>Go to <a href="https://api.nasa.gov/" target="_blank">NASA Open APIs</a> to learn more.</p>
+        </footer>
+    </div>
+
+    <script>
+        function goToMission() {
+            const dropdown = document.getElementById("mission-dropdown");
+            const selectedMission = dropdown.value;
+
+            // Use a mapping to get Flask route names (if different from dropdown values)
+            // Or directly navigate to the dropdown value if it matches the Flask route
+            let url = "";
+            if (selectedMission === "earth") {
+                url = "{{url_for('earth')}}"; // Flask generates /earth
+            } else if (selectedMission === "mars") {
+                url = "{{url_for('mars')}}";   // Flask generates /mars
+            } 
+
+            if (url) {
+                window.location.href = url;
+            } else {
+                alert("Mission not yet implemented. Please select Earth or Mars.");
+            }
+        }
+    </script>
+
+</body>
+</html>
