@@ -3,71 +3,232 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>NASA Earth Image Downloader</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+    <title>NASA Earth Image Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <div class="main-container"> <header class="app-header">
-            <h2>🌍 Earth Imagery Explorer</h2>
-            <p class="tagline">Visualize Earth's surface for specific locations and dates.</p>
+    <div class="main-container">
+        <header class="app-header">
+            <h2>Earth Image Explorer</h2>
+            <p class="tagline">Explore Earth imagery: get single shots or compare changes over time with NASA's satellite data.</p>
         </header>
 
-        <section class="mission-selection-card"> <h3>Get Satellite Image</h3>
-            {% if error %}
-                <div class="error-message">
-                    {{ error }}
-                </div>
-            {% endif %}
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button id="showSingleDual" class="tab-button">
+                <span>📸 Single Image</span>
+            </button>
+            <button id="showCompareCollage" class="tab-button active">
+                <span>🔄 Compare Images</span>
+            </button>
+        </div>
 
-            <form action="/earth" method="POST">
-                <div class="form-group">
-                    <label for="api"></label>
-                    <input type="text" id="api" name="api" placeholder="Enter your API Key"
-                            required>
-                </div>
-                <div class="form-group">
-                    <label for="latitude"></label>
-                    <input type="text" id="latitude" name="latitude" placeholder="Latitude: e.g. 22.5"
-                            required>
-                </div>
-                <div class="form-group">
-                    <label for="longitude"></label>
-                    <input type="text" id="longitude" name="longitude" placeholder=" Longitude: e.g. 88.3"
-                            required>
-                </div>
-                <div class="form-group">
-                    <label for="date">Date:</label>
-                    <input type="date" id="date" name="date"
-                           value=" date " required>
-                </div>
-                <div class="form-group">
-                <label for="mission-dropdown">Area</label>
-                <select id="area" name="area" class="modern-dropdown">
-                    <option value="">-- Select an Area --</option>
-                       <option value="1" {% if area_val == "1" %}selected{% endif %}>Highly Zoomed in(1x1 Km)</option>
-                        <option value="25" {% if area_val == "25" %}selected{% endif %}>Neighbourhood/City(5x5 Km)</option>
-                        <option value="100" {% if area_val == "100" %}selected{% endif %}>Regional View(10x10 Km)</option>
-                        <option value="400" {% if area_val == "400" %}selected{% endif %}>Large Area/State(20x20 Km)</option>
-                        <option value="2500" {% if area_val == "2500" %}selected{% endif %}>Continental(50x50 Km)</option>
-                        <option value="10000" {% if area_val == "10000" %}selected{% endif %}>Global View(100x100 Km)</option>
-                    </select>
-            </div>
-                <button type="submit" class="action-button">Get Image</button>
-            </form>
-        </section>
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Section 1: Get Single/Dual Images -->
+            <section id="singleDualSection" class="content-panel">
+                <section class="mission-selection-card">
+                    <h3>📸 Get Satellite Image(s)</h3>
+                    <p>Retrieve high-resolution satellite imagery from any location on Earth. Compare changes over time with optional second date.</p>
+                    
+                    {% if error_single_dual %}
+                        <div class="error-message">
+                            <strong>⚠️ Error:</strong> {{ error_single_dual }}
+                        </div>
+                    {% endif %}
 
-        {% if image_url %}
-            <section class="image-display-card"> <h3>Here is your image:</h3>
-                <img src="{{ image_url }}" alt="Earth Image">
-                <p>The image was downloaded and served from your server.</p>
-                <a href="{{ image_url }}" download="nasa_earth_image.jpeg" class="download-button">
-                    Download Image
-                </a>
+                    <form action="/earth" method="POST">
+                        <input type="hidden" name="form_type" value="single_dual">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="api">🔑 NASA API Key</label>
+                                <input type="text" id="api" name="api" placeholder="Enter your NASA API key"
+                                       value="{{ api_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="latitude">📍 Latitude</label>
+                                <input type="text" id="latitude" name="latitude" placeholder="e.g., 37.7749"
+                                       value="{{ lat_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="longitude">📍 Longitude</label>
+                                <input type="text" id="longitude" name="longitude" placeholder="e.g., -122.4194"
+                                       value="{{ lon_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="date">📅 Date</label>
+                                <input type="date" id="date" name="date" value="{{ date_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="area">🔍 Coverage Area</label>
+                                <select id="area" name="area" class="modern-dropdown" required>
+                                    <option value="">Select coverage area...</option>
+                                    <option value="1" {% if area_val == "1" %}selected{% endif %}>🔍 Highly Zoomed (1x1 km)</option>
+                                    <option value="25" {% if area_val == "25" %}selected{% endif %}>🏘️ Neighborhood (5x5 km)</option>
+                                    <option value="100" {% if area_val == "100" %}selected{% endif %}>🏙️ Regional (10x10 km)</option>
+                                    <option value="400" {% if area_val == "400" %}selected{% endif %}>🌆 Large Area (20x20 km)</option>
+                                    <option value="2500" {% if area_val == "2500" %}selected{% endif %}>🌍 Continental (50x50 km)</option>
+                                    <option value="10000" {% if area_val == "10000" %}selected{% endif %}>🌎 Global (100x100 km)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="action-button">
+                            <span>🚀 Get Satellite Image</span>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Display Section for Single/Dual Images -->
+                {% if image_url %}
+                    <section class="image-display-card">
+                        <h3>🛰️ Your Satellite Image(s)</h3>
+                        <div class="image-comparison-container">
+                            {% if image_url %}
+                                <div class="image-wrapper">
+                                    <img src="{{ image_url }}" alt="Earth Image - Date 1">
+                                    <p><strong>📅 Date:</strong> {{ date_val }}</p>
+                                    <a href="{{ image_url }}" download="nasa_earth_image_date1.jpeg" class="download-button">
+                                        <span>💾 Download Image</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p><em>✨ Image enhanced and served from your local server</em></p>
+                    </section>
+                {% endif %}
             </section>
-        {% endif %}
+
+            <!-- Section 2: Compare Images & Collage -->
+            <section id="compareCollageSection" class="content-panel active-content">
+                <section class="mission-selection-card">
+                    <h3>🔄 Compare & Collage Images</h3>
+                    <p>Generate a side-by-side comparison image showing changes between two dates at the same location.</p>
+                    
+                    {% if error_collage %}
+                        <div class="error-message">
+                            <strong>⚠️ Error:</strong> {{ error_collage }}
+                        </div>
+                    {% endif %}
+
+                    <form action="/earth" method="POST">
+                        <input type="hidden" name="form_type" value="collage">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="api_collage">🔑 NASA API Key</label>
+                                <input type="text" id="api_collage" name="api_collage" placeholder="Enter your NASA API key"
+                                       value="{{ api_collage_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="latitude_collage">📍 Latitude</label>
+                                <input type="text" id="latitude_collage" name="latitude_collage" placeholder="e.g., 37.7749"
+                                       value="{{ latitude_collage_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="longitude_collage">📍 Longitude</label>
+                                <input type="text" id="longitude_collage" name="longitude_collage" placeholder="e.g., -122.4194"
+                                       value="{{ longitude_collage_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="date1_collage">📅 Date 1 (Earlier)</label>
+                                <input type="date" id="date1_collage" name="date1_collage" value="{{ date1_collage_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="date2_collage">📅 Date 2 (Later)</label>
+                                <input type="date" id="date2_collage" name="date2_collage" value="{{ date2_collage_val }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="area_collage">🔍 Coverage Area</label>
+                                <select id="area_collage" name="area_collage" class="modern-dropdown" required>
+                                    <option value="">Select coverage area...</option>
+                                    <option value="1" {% if area_collage_val == "1" %}selected{% endif %}>🔍 Highly Zoomed (1x1 km)</option>
+                                    <option value="25" {% if area_collage_val == "25" %}selected{% endif %}>🏘️ Neighborhood (5x5 km)</option>
+                                    <option value="100" {% if area_collage_val == "100" %}selected{% endif %}>🏙️ Regional (10x10 km)</option>
+                                    <option value="400" {% if area_collage_val == "400" %}selected{% endif %}>🌆 Large Area (20x20 km)</option>
+                                    <option value="2500" {% if area_collage_val == "2500" %}selected{% endif %}>🌍 Continental (50x50 km)</option>
+                                    <option value="10000" {% if area_collage_val == "10000" %}selected{% endif %}>🌎 Global (100x100 km)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="action-button">
+                            <span>🔄 Generate Comparison</span>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Display Collaged Image -->
+                {% if collaged_image_url %}
+                    <section class="image-display-card">
+                        <h3>🖼️ Your Comparison Image</h3>
+                        <img src="{{ collaged_image_url }}" alt="Collaged Earth Image">
+                        <p><strong>📊 Comparison:</strong> {{ date1_collage_val }} vs {{ date2_collage_val }}</p>
+                        <a href="{{ collaged_image_url }}" download="nasa_earth_collage_{{ date1_collage_val }}_{{ date2_collage_val }}.jpeg" class="download-button">
+                            <span>💾 Download Comparison</span>
+                        </a>
+                    </section>
+                {% endif %}
+            </section>
+        </div>
 
         <footer class="app-footer">
-            <p>Go back to the <a href="{{url_for( 'index')}}">main page</a>.</p>
+            <p>🔙 <a href="{{url_for('index')}}">Back to Mission Control</a></p>
         </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const showSingleDualBtn = document.getElementById('showSingleDual');
+            const showCompareCollageBtn = document.getElementById('showCompareCollage');
+            const singleDualSection = document.getElementById('singleDualSection');
+            const compareCollageSection = document.getElementById('compareCollageSection');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const contentPanels = document.querySelectorAll('.content-panel');
+
+            function showPanel(panelToShow, activeBtn) {
+                contentPanels.forEach(panel => panel.classList.remove('active-content'));
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+
+                if (panelToShow) {
+                    panelToShow.classList.add('active-content');
+                }
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
+                }
+            }
+
+            showSingleDualBtn.addEventListener('click', function() {
+                showPanel(singleDualSection, showSingleDualBtn);
+            });
+
+            showCompareCollageBtn.addEventListener('click', function() {
+                showPanel(compareCollageSection, showCompareCollageBtn);
+            });
+
+            const hasSingleDualData = "{{ image_url or image_url_2 or error_single_dual }}";
+            const hasCollageData = "{{ collaged_image_url or error_collage }}";
+
+            if (hasSingleDualData) {
+                showPanel(singleDualSection, showSingleDualBtn);
+            } else {
+                showPanel(compareCollageSection, showCompareCollageBtn);
+            }
+
+            if (!hasCollageData && !hasSingleDualData) {
+                showSingleDualBtn.click();
+            }
+        });
+    </script>
 </body>
 </html>
