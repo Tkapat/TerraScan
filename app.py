@@ -11,9 +11,8 @@ if not os.path.exists(app.static_folder):
     os.makedirs(app.static_folder)
 
 # --- IMPORTANT: Replace with your actual NASA API Key ---
-API_KEY = "vxNXyxn7JteE6pLjj7dqmgfXuQR2hqDeHlVVUHGD"
-# For production, consider using environment variables for API keys
-# e.g., API_KEY = os.environ.get("NASA_API_KEY")
+# For production, use environment variables for API keys
+API_KEY = os.environ.get("NASA_API_KEY", "vxNXyxn7JteE6pLjj7dqmgfXuQR2hqDeHlVVUHGD")
 # --------------------------------------------------------
 
 # --- NEW: Helper function to fetch, enhance, and save a single image ---
