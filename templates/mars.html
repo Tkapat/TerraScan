@@ -3,23 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mars Explorer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+    <title>Mars Rover Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
     <div class="main-container">
         <header class="app-header">
-            <h2>🚀 Mars Mission Explorer</h2>
-            <p class="tagline">Discover fascinating photos from the Red Planet!</p>
+            <h2>Mars Rover Explorer</h2>
+            <p class="tagline">Discover fascinating photos from the Red Planet! Explore thousands of images captured by NASA's Mars rovers.</p>
         </header>
 
         <section class="mission-selection-card">
-            <h3>Explore Mars Data</h3>
+            <h3>Explore Mars Rover Images</h3>
             <p>{{ message }}</p>
-            <p>This section is under construction! Check back soon for more Mars discoveries.</p>
+            
+            <form method="POST" class="mars-form">
+                <div class="form-group">
+                    <label for="rover">🤖 Select Rover</label>
+                    <select name="rover" id="rover" required>
+                        {% for rover in rovers %}
+                        <option value="{{ rover.name }}" {% if selected_rover == rover.name %}selected{% endif %}>
+                            {{ rover.name.title() }} ({{ rover.status }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sol">📅 Martian Day (Sol)</label>
+                    <input type="number" name="sol" id="sol" value="{{ selected_sol }}" min="0" max="4000" required>
+                    <small>Sol is a Martian day. Curiosity has been active since sol 0 (August 6, 2012)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="camera">📷 Camera (Optional)</label>
+                    <select name="camera" id="camera">
+                        <option value="all" {% if selected_camera == "all" %}selected{% endif %}>📸 All Cameras</option>
+                        <option value="fhaz" {% if selected_camera == "fhaz" %}selected{% endif %}>🚗 Front Hazard Avoidance Camera</option>
+                        <option value="rhaz" {% if selected_camera == "rhaz" %}selected{% endif %}>🚗 Rear Hazard Avoidance Camera</option>
+                        <option value="mast" {% if selected_camera == "mast" %}selected{% endif %}>🔭 Mast Camera</option>
+                        <option value="chemcam" {% if selected_camera == "chemcam" %}selected{% endif %}>🧪 Chemistry and Camera Complex</option>
+                        <option value="mahli" {% if selected_camera == "mahli" %}selected{% endif %}>🔍 Mars Hand Lens Imager</option>
+                        <option value="mardi" {% if selected_camera == "mardi" %}selected{% endif %}>📹 Mars Descent Imager</option>
+                        <option value="navcam" {% if selected_camera == "navcam" %}selected{% endif %}>🧭 Navigation Camera</option>
+                        <option value="pancam" {% if selected_camera == "pancam" %}selected{% endif %}>🖼️ Panoramic Camera</option>
+                        <option value="minites" {% if selected_camera == "minites" %}selected{% endif %}>🌡️ Miniature Thermal Emission Spectrometer</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <span>🚀 Fetch Mars Images</span>
+                </button>
+            </form>
         </section>
 
+        {% if images %}
+        <section class="image-gallery">
+            <h3>Mars Rover Images</h3>
+            <div class="image-grid">
+                {% for image in images %}
+                <div class="image-card">
+                    <img src="{{ image.img_src }}" alt="Mars rover image" loading="lazy">
+                    <div class="image-info">
+                        <p><strong>🤖 Rover:</strong> {{ image.rover.name.title() }}</p>
+                        <p><strong>📷 Camera:</strong> {{ image.camera.full_name }}</p>
+                        <p><strong>📅 Sol:</strong> {{ image.sol }}</p>
+                        <p><strong>🌍 Earth Date:</strong> {{ image.earth_date }}</p>
+                        <a href="{{ image.img_src }}" target="_blank" class="btn-secondary">
+                            <span>🔍 View Full Size</span>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
         <footer class="app-footer">
-            <p>Go back to the <a href="{{url_for('index')}}">main page</a>.</p>
+            <p>🔙 <a href="{{url_for('index')}}">Back to Mission Control</a></p>
         </footer>
     </div>
 </body>
